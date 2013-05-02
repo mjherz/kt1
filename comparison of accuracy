@@ -1,0 +1,400 @@
+a1, .77033, 6 of 9
+
+
+a2, .77512, 4 of 7, removed glmstepaic and svm
+> fitresults1
+        X1         X2        X3        X4
+1     jrip      class 0.7934096 0.5433365
+2       rf      class 0.8103435 0.5877229
+3    ctree      class 0.8052682 0.5736379
+4  cforest      class 0.8020246 0.5577973
+5      j48      class 0.7997006 0.5515010
+6      gbm      class 0.8000214 0.5636591
+7   glmnet regression 0.9880602       NaN
+8 c50rules      class 0.7950043 0.5532440
+9     PART      class 0.7930171 0.5460452
+
+
+a3-- 2 of 8, removed glmnet, added ctree and cforest, removed embarked from these models .77033
+        X1    X2        X3        X4
+1     jrip class 0.7934096 0.5433365
+2       rf class 0.8103435 0.5877229
+3    ctree class 0.8051508 0.5747961
+4  cforest class 0.8071884 0.5784746
+5      j48 class 0.8031814 0.5571546
+6      gbm class 0.8018772 0.5672744
+7 c50rules class 0.7915563 0.5439008
+8     PART class 0.7963857 0.5529460
+
+
+
+a4-- svd to determine independence and similiarity of tools, 3 of 4 ,Kappa metric, LOOCV
+ fitresults1
+         X1    X2        X3        X4
+1      jrip class 0.8029469 0.5591637
+2        rf class 0.8091177 0.5849257
+3     ctree class 0.7968386 0.5467355
+4   cforest class 0.8046170 0.5588832
+5       j48 class 0.7890820 0.5316890
+6       gbm class 0.7986466 0.5607594
+7  c50rules class 0.7953869 0.5438085
+8      PART class 0.7983325 0.5572966
+9  glmboost class 0.7827898 0.5337820
+10     nnet class 0.7989824 0.5521232
+11   bagFDA class 0.7952809 0.5563135
+12      svm class 0.7975153 0.5448735
+
+narrowed to four, used majority 3 of 4 vote
+> fitresults2
+        X1    X2        X3        X4
+1  cforest class 0.8076490 0.5652911
+2 c50rules class 0.7885264 0.5279984
+3     nnet class 0.8031496 0.5603773
+4      svm class 0.8087739 0.5680914
+
+a4probe-- after removal of a probe set (20%) and LOOCV, test fit on reduced training set
+> fitresults2
+        X1    X2        X3        X4
+1  cforest class 0.7851124 0.5149518
+2 c50rules class 0.7823034 0.5262299
+3     nnet class 0.7879213 0.5293149
+4      svm class 0.7766854 0.4982627
+
+tested against probe set
+overall stats
+> confusionMatrix(as.factor(resprobe1$survpred),as.factor(probe1$survived))
+Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 100  24
+         1   6  47
+                                         
+               Accuracy : 0.8305         
+                 95% CI : (0.767, 0.8826)
+    No Information Rate : 0.5989         
+    P-Value [Acc > NIR] : 2.531e-11      
+                                         
+                  Kappa : 0.6318         
+ Mcnemar's Test P-Value : 0.001911       
+                                         
+            Sensitivity : 0.9434         
+            Specificity : 0.6620         
+         Pos Pred Value : 0.8065         
+         Neg Pred Value : 0.8868         
+             Prevalence : 0.5989         
+         Detection Rate : 0.5650         
+   Detection Prevalence : 0.7006         
+                                         
+       'Positive' Class : 0              
+postResample without factors treats as regression
+                                         
+> postResample(resprobe1$survpred,probe1$survived)
+     RMSE  Rsquared 
+0.4116935 0.4196678 
+all compared against probe set
+> acc1
+     class       acc     kappa      rmse       rsq      sens      spec       ppv       npv
+1 overall 0.8305085 0.6318125 0.4116935 0.4196678 0.9433962 0.6619718 0.8064516 0.8867925
+2 cforest 0.8418079 0.6546823 0.3977337 0.4563742 0.9622642 0.6619718 0.8095238 0.9215686
+3     c50 0.8079096 0.5945290 0.4382812 0.3552838 0.8679245 0.7183099 0.8214286 0.7846154
+4    nnet 0.8192090 0.6129032 0.4251952 0.3837364 0.9056604 0.6901408 0.8135593 0.8305085
+5     svm 0.8248588 0.6222895 0.4184988 0.4006261 0.9245283 0.6760563 0.8099174 0.8571429
+
+cforest completed on entire training set, loocv
+  mtry  Accuracy     Kappa
+1    2 0.7862767 0.4993360
+2    4 0.8110236 0.5721505
+3    6 0.8053993 0.5612557
+
+
+a5glmu - glmu only (kfold validation) using formula
+survfact ~ 1 + sex + pclass + fare + fam + sibsp + parch + secname + 
+    pclass:sex + fam:fare + sex:sibsp + sex:secname + pclass:fare + 
+    pclass:fam + pclass:sibsp + title:parch
+
+     class       acc     kappa      rmse       rsq      sens      spec       ppv       npv
+1  overall 0.8192090 0.6110424 0.4251952 0.3845072 0.9150943 0.6760563 0.8083333 0.8421053
+2 cforest1 0.8248588 0.6222895 0.4184988 0.4006261 0.9245283 0.6760563 0.8099174 0.8571429
+3 cforest2 0.8135593 0.5940085 0.4317878 0.3732400 0.9339623 0.6338028 0.7920000 0.8653846
+4     glmu 0.8361582 0.6516930 0.4047738 0.4297249 0.9056604 0.7323944 0.8347826 0.8387097
+5     <NA>        NA        NA        NA        NA        NA        NA        NA        NA
+
+formula developed by glmulti
+
+result=.76077
+
+
+
+a5aglmu, like a5glmu but loocv
+
+acc=0.75120
+
+
+
+a5b- vote between three
+
+cforest1:
+"survfact~pclass+sex+sibsp+parch+fare"
+cforest2:
+survfact~sex+pclass+fare+fam+sibsp+parch+title+secname
+glmu from 5 and 5a
+
+
+
+accuracy=<BS>0.77033
+
+
+a5c, loocv with cforest2 only
+survfact~sex+pclass+fare+fam+sibsp+parch+title+secname
+accuracy=.77033
+
+experiment with ccforest2
+
+> ccforest2$results
+  mtry  Accuracy     Kappa
+1    2 0.6175478 0.0000000
+2    4 0.7817773 0.4944333
+3    6 0.7997750 0.5644172
+> ccforest4$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    4 0.7626404 0.4353555
+3    6 0.7935393 0.5417834
+ccforest2=survfact~sex+pclass+fare+fam+sibsp+parch+title+secname
+ccforest4=survfact~sex+pclass+fare+fam+sibsp+parch+title+secname+embarked
+
+a6 comparison of different models in cforest
+original form1<-as.formula("survfact~pclass+sex+sibsp+parch+fare")
+subset of train1 (train3)
+> ccforest1$results
+  mtry  Accuracy     Kappa
+1    2 0.7808989 0.4809089
+2    4 0.7808989 0.5058239
+3    6 0.7991573 0.5576218
+> 
+> form2<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked")
+> ccforest2<-train(form2,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest2$results
+  mtry  Accuracy     Kappa
+1    2 0.7738764 0.4620842
+2    4 0.7935393 0.5243929
+3    6 0.7865169 0.5169995
+> 
+> form3<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam")
+> ccforest3<-train(form3,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest3$results
+  mtry  Accuracy     Kappa
+1    2 0.7500000 0.3949105
+2    4 0.7935393 0.5251438
+3    6 0.7823034 0.5078487
+> 
+> form4<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam+title")
+> ccforest4<-train(form4,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest4$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    4 0.7710674 0.4536176
+3    6 0.7893258 0.5320756
+> form5<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam+title+secname")
+> ccforest5<-train(form5,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest5$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    4 0.7724719 0.4618191
+3    6 0.7907303 0.5369601
+> 
+> form6<-as.formula("survfact~pclass+sex+fare+parch+title+secname")
+> ccforest6<-train(form6,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest6$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    4 0.7738764 0.4707273
+3    6 0.7794944 0.5193988
+> 
+> form7<-as.formula("survfact~pclass+sex+fare+fam+title+secname")
+> ccforest7<-train(form7,data=train3,method="cforest",trControl=fitcontrol)
+> ccforest7$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    4 0.7724719 0.4635612
+3    6 0.7865169 0.5322551
+
+tunegrid1<-expand.grid(.mtry=c(2,3,4,5,6,7,8))
+ccforest8<-train(form1,data=train3,method="cforest",tuneGrid=tunegrid1,trControl=fitcontrol)
+ccforest8$results
+  mtry  Accuracy     Kappa
+1    2 0.7808989 0.4809089
+2    3 0.7808989 0.4809089
+3    4 0.7879213 0.5212923
+4    5 0.7991573 0.5576218
+5    6 0.7991573 0.5576218
+6    7 0.7991573 0.5576218
+7    8 0.7991573 0.5576218
+
+tunegrid1<-expand.grid(.mtry=c(2:9))
+ccforest9<-train(form5,data=train3,method="cforest",tuneGrid=tunegrid1,trControl=fitcontrol)
+ccforest9$results
+  mtry  Accuracy     Kappa
+1    2 0.6221910 0.0000000
+2    3 0.6643258 0.1366238
+3    4 0.7654494 0.4429474
+4    5 0.7738764 0.4807393
+5    6 0.7935393 0.5410842
+6    7 0.8033708 0.5691824
+7    8 0.8146067 0.5968325
+8    9 0.8188202 0.6062892
+
+> tunegrid2<-expand.grid(.mtry=c(6:9))
+> ccforest10<-train(form5,data=train1,method="cforest",tuneGrid=tunegrid2,trControl=fitcontrol)
+> ccforest10$results
+  mtry  Accuracy     Kappa
+1    6 0.8008999 0.5651130
+2    7 0.8020247 0.5683180
+3    8 0.8166479 0.6018109
+4    9 0.8188976 0.6075981
+
+improved to .78469
+
+
+a8
+ccforest20
+used python to create family structure:
+form20<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam+title+secname+husband+father+wife+mother+son+daughter")
+
+> ccforest20$results
+   mtry  Accuracy     Kappa
+1     5 0.7780899 0.5078700
+2     6 0.7935393 0.5493360
+3     7 0.7977528 0.5588638
+4     8 0.8075843 0.5824958
+5     9 0.8117978 0.5931533
+6    10 0.8174157 0.6041230
+7    11 0.8216292 0.6146923
+8    12 0.8272472 0.6262738
+9    13 0.8258427 0.6235150
+10   14 0.8272472 0.6273806
+11   15 0.8286517 0.6301362
+> 
+> set.seed(6001)
+> form5<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam+title+secname")
+> tunegrid2<-expand.grid(.mtry=c(6:9))
+> ccforest9<-train(form5,data=train3,method="cforest",tuneGrid=tunegrid2,trControl=fitcontrol)
+> ccforest9$results
+  mtry  Accuracy     Kappa
+1    6 0.7907303 0.5376623
+2    7 0.7991573 0.5602812
+3    8 0.8117978 0.5901120
+4    9 0.8160112 0.6001852
+> survprobe9<-predict(ccforest9,probe1)
+> postResample(as.factor(survprobe9),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8305085 0.6370968 
+> confusionMatrix(as.factor(survprobe9),as.factor(probe1$survived))$byClass[1:4]
+   Sensitivity    Specificity Pos Pred Value Neg Pred Value 
+     0.9150943      0.7042254      0.8220339      0.8474576 
+> confusionMatrix(as.factor(survprobe9),as.factor(probe1$survived))$table
+          Reference
+Prediction  0  1
+         0 97 21
+         1  9 50
+> 
+> survprobe20<-predict(ccforest20,probe1)
+> postResample(as.factor(survprobe20),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8305085 0.6405361 
+> confusionMatrix(as.factor(survprobe20),as.factor(probe1$survived))$byClass[1:4]
+   Sensitivity    Specificity Pos Pred Value Neg Pred Value 
+     0.8962264      0.7323944      0.8333333      0.8253968 
+> confusionMatrix(as.factor(survprobe20),as.factor(probe1$survived))$table
+          Reference
+Prediction  0  1
+         0 95 19
+         1 11 52
+
+only based training on train3
+
+ccforest20 (form20, 15 terms, loocv, mtry=15) improvement in accuracy:
+.78947
+
+
+
+a9: kaggle = .78947
+used a medley of Medley of cforest, nnet, svml, svmr, nb; tuned with k-fold (except for nb)
+
+> postResample(as.factor(survprobecomb1),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8418079 0.6629030 
+> postResample(as.factor(survprober2),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8079096 0.5945290 
+> postResample(as.factor(survprobel2),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8361582 0.6500307 
+> postResample(as.factor(survprobe21),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8248588 0.6241008 
+> postResample(as.factor(survprobenn2),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8305085 0.6422315 
+> postResample(as.factor(survprobenb3),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.6892655 0.2850848 
+
+a9, submission a:
+only used cforest, nnet, svml
+same result
+
+a10
+ccforest23
+used families3
+form23<-as.formula("survfact~pclass+sex+sibsp+fare+fam+title+cv")
+  7     0.812     0.594  0.0512       0.109   
+
+Accuracy was used to select the optimal model using  the largest value.
+The final value used for the model was mtry = 7. 
+
+same result
+
+a10a
+ccforest24
+used families3
+form24<-as.formula("survfact~pclass+sex+sibsp+parch+fare+embarked+fam+title+secname+husband+father+wife+mother+son+daughter+cv")
+ mtry  Accuracy  Kappa  Accuracy SD  Kappa SD
+  10    0.825     0.622  0.0495       0.104   
+  11    0.831     0.635  0.0461       0.0983  
+same result
+
+
+a11
+compared random forest models outside of R: randomforest, cforest
+narrowed variable selection using varimp and importance
+Found best
+form25<-as.formula("survfact~pclass+sex+sibsp+fare+fam+title+cv+secname")
+rf25<-randomForest(form25,data=train3,importance=TRUE)
+> postResample(as.factor(survproberf25),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8418079 0.6660827 
+used families3 and families2 (only difference was cabgr, not used)
+
+actual--.77033 even worse
+
+a12
+developed random training space
+form27<-as.formula("survfact~ticknum+pclass+sex+sibsp+fare+fam+title+secname")
+rf32<-train(form27,data=train2,trControl=fitctrllcv)
+#mtry=2 16.88
+#mtry=3 17.58
+#mtry=4 18
+rf32<-train(form27,data=train2,trControl=fitctrllcv)
+
+postResample(as.factor(survproberf32),as.factor(probe1$survived))
+ Accuracy     Kappa 
+0.8418079 0.6645004 
+
+Result:75120 (even worse)
+
+difference between cforest and rf
+increase mtry with cforest
+try more variables
+can we use cabin when available?
